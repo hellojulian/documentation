@@ -1,37 +1,154 @@
 ---
-title: "Alerts"
-description: "Alert component variations and states"
+title: "Alert Components"
+description: "Versatile alert components for notifications, warnings, errors, and success messages"
 ---
 
 # Alert Components
 
-Alert components for displaying notifications, warnings, errors, and success messages. All screenshots are automatically captured from Figma and updated here.
-
-<Note>
-  Component screenshots sync automatically from Figma.
-</Note>
-
-## Component Screenshots
-
-<Note>
-  Last updated: 10/15/2025, 10:57:13 PM
-</Note>
-
-
-## 22123-476643
+The Alert component provides a flexible way to display important messages to users. It supports multiple variants, styles, and interactive elements to cover all notification scenarios in your application.
 
 <img
   src="https://raw.githubusercontent.com/hellojulian/mintlify/main/public/images/figma-22123-476643.png"
-  alt="Component screenshot for 22123:476643"
-  style="border: 1px solid #e2e8f0; border-radius: 8px; margin: 16px 0;"
+  alt="Alert component variations showing different styles and states"
+  style="border: 1px solid #e2e8f0; border-radius: 8px; margin: 24px 0;"
 />
 
+## Component API
 
-## Usage Guidelines
+### Props
 
-Once screenshots are available, this section will show:
-- Component variations (Success, Info, Error, Warning)
-- Different styles (Solid, Outline)
-- Layout options (Title Only, Title+Description)
-- Action buttons and close functionality
-- Design specifications
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | string | `"{Alert Title}"` | The main alert message |
+| `description` | string | `"Lorem ipsum etc ariart skll."` | Optional additional description text |
+| `status` | `'01 Success' \| '02 Info' \| '03 Error' \| '04 Warning'` | `'01 Success'` | Determines the alert type and icon |
+| `styles` | `'Solid' \| 'Outline'` | `'Solid'` | Visual style variant |
+| `types` | `'Title Only' \| 'Title+Description'` | `'Title Only'` | Layout configuration |
+| `closeButton` | boolean | `true` | Show/hide the close button |
+| `actionButton` | boolean | `true` | Show/hide the action button |
+| `className` | string | - | Additional CSS classes |
+
+## Variants
+
+### Status Types
+
+#### Success Alert
+Use for positive confirmation messages and successful operations.
+```jsx
+<Alert 
+  status="01 Success"
+  title="Successfully saved!"
+  description="Your changes have been saved to the server."
+/>
+```
+
+#### Info Alert  
+Use for neutral informational messages.
+```jsx
+<Alert 
+  status="02 Info"
+  title="New feature available"
+  description="Check out our latest updates in the changelog."
+/>
+```
+
+#### Error Alert
+Use for error states and failed operations.
+```jsx
+<Alert 
+  status="03 Error" 
+  title="Failed to save"
+  description="Please check your connection and try again."
+/>
+```
+
+#### Warning Alert
+Use for cautionary messages and potential issues.
+```jsx
+<Alert 
+  status="04 Warning"
+  title="Storage almost full"
+  description="You're using 90% of your available storage space."
+/>
+```
+
+### Style Variants
+
+#### Solid Style
+High-contrast style with filled background colors.
+```jsx
+<Alert styles="Solid" status="01 Success" title="Operation complete" />
+```
+
+#### Outline Style  
+Subtle style with border and transparent background.
+```jsx
+<Alert styles="Outline" status="02 Info" title="Information update" />
+```
+
+### Layout Types
+
+#### Title Only
+Compact layout for brief messages.
+```jsx
+<Alert 
+  types="Title Only"
+  title="Quick notification"
+  closeButton={true}
+/>
+```
+
+#### Title + Description
+Extended layout for detailed messages.
+```jsx
+<Alert 
+  types="Title+Description"
+  title="Detailed notification"
+  description="This provides additional context and information about the alert."
+/>
+```
+
+## Interactive Elements
+
+### Action Buttons
+Action buttons allow users to take immediate action on alerts.
+```jsx
+<Alert 
+  title="Update available"
+  description="A new version is ready to install."
+  actionButton={true}
+/>
+```
+
+### Close Button
+The close button allows users to dismiss alerts.
+```jsx
+<Alert 
+  title="Dismissible alert"
+  closeButton={true}
+/>
+```
+
+## Best Practices
+
+### When to Use
+- **Success**: Confirm completed actions (saves, submissions, etc.)
+- **Info**: Provide helpful information or feature announcements  
+- **Warning**: Alert users to potential issues or required actions
+- **Error**: Communicate failures and provide recovery guidance
+
+### Content Guidelines
+- Keep titles concise and action-oriented
+- Use descriptions to provide additional context when needed
+- Include clear next steps for error and warning states
+- Use consistent tone and terminology across alert types
+
+### Accessibility
+- All alerts include appropriate ARIA labels
+- Icons provide semantic meaning beyond color
+- Focus management for dismissible alerts
+- Screen reader friendly status announcements
+
+<Note>
+  Alert screenshots sync automatically from Figma. Last updated: 10/15/2025, 10:57:13 PM
+</Note>
