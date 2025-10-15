@@ -25,16 +25,6 @@
     "name": "Dashboard",
     "url": "https://dashboard.mintlify.com"
   },
-  "tabs": [
-    {
-      "name": "Design Tokens",
-      "url": "tokens"
-    },
-    {
-      "name": "Components",
-      "url": "components"
-    }
-  ],
   "anchors": [
     {
       "name": "Documentation",
@@ -58,12 +48,8 @@
       "pages": ["introduction", "quickstart", "development"]
     },
     {
-      "group": "Design Tokens",
-      "pages": ["tokens/overview", "tokens/colors", "tokens/typography", "tokens/spacing"]
-    },
-    {
       "group": "Components",
-      "pages": ["components/overview", "components/alerts", "components/forms", "components/cards"]
+      "pages": ["components/overview", "components/alerts"]
     }
   ],
   "footerSocials": {

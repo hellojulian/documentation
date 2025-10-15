@@ -6,13 +6,15 @@
   "scripts": {
     "sync:figma": "node scripts/pull-figma-and-update-docs.mjs",
     "webhook:setup": "node scripts/setup-figma-webhook.mjs",
-    "webhook:ngrok": "ngrok http 3000"
+    "webhook:ngrok": "ngrok http 3000",
+    "deploy": "mintlify deploy"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "@percy/cli": "^1.28.0"
+    "@percy/cli": "^1.28.0",
+    "mintlify": "^4.0.0"
   }
 }
