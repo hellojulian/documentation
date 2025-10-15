@@ -34,12 +34,9 @@ jobs:
         
       - name: Percy visual snapshots
         if: always()
-        uses: percy/exec-action@v1
-        env:
-          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
-        with:
-          command: |
-            echo "Percy snapshots would run here - configure after Mintlify deployment"
+        run: |
+          echo "Percy snapshots would run here - configure after Mintlify deployment"
+          echo "PERCY_TOKEN is set: ${{ secrets.PERCY_TOKEN != '' }}"
             
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
