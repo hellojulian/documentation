@@ -183,10 +183,9 @@ async function updateComponentPages(screenshots) {
   
   // Group screenshots by component type (you can customize this logic)
   const componentGroups = {
-    buttons: screenshots.filter(img => 
-      img.nodeId.toLowerCase().includes('button') || 
-      img.nodeId.toLowerCase().includes('btn') ||
-      img.nodeId.includes('22123:476643') // Add your specific alert/button node
+    alerts: screenshots.filter(img => 
+      img.nodeId.toLowerCase().includes('alert') || 
+      img.nodeId.includes('22123:476643') // Your specific alert component node
     ),
     forms: screenshots.filter(img => 
       img.nodeId.toLowerCase().includes('form') || 
@@ -197,8 +196,7 @@ async function updateComponentPages(screenshots) {
       img.nodeId.toLowerCase().includes('card')
     ),
     other: screenshots.filter(img => 
-      !img.nodeId.toLowerCase().includes('button') &&
-      !img.nodeId.toLowerCase().includes('btn') &&
+      !img.nodeId.toLowerCase().includes('alert') &&
       !img.nodeId.includes('22123:476643') &&
       !img.nodeId.toLowerCase().includes('form') &&
       !img.nodeId.toLowerCase().includes('input') &&

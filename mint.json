@@ -63,7 +63,7 @@
     },
     {
       "group": "Components",
-      "pages": ["components/overview", "components/buttons", "components/forms", "components/cards"]
+      "pages": ["components/overview", "components/alerts", "components/forms", "components/cards"]
     }
   ],
   "footerSocials": {
