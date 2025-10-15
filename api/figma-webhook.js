@@ -1,4 +1,4 @@
-import { createHmac } from 'crypto';
+const { createHmac } = require('crypto');
 
 // Webhook verification function
 function verifyFigmaWebhook(payload, signature, secret) {
@@ -9,7 +9,7 @@ function verifyFigmaWebhook(payload, signature, secret) {
 }
 
 // Main webhook handler function
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Handle CORS for browser requests
   if (req.method === 'OPTIONS') {
     return res.status(200).json({ message: 'OK' });
