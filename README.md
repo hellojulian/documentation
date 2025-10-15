@@ -1,2 +1,1 @@
-# reshaped
-reshaped-test
+# mintlify test
