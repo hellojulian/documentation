@@ -5,9 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "mintlify dev",
-    "build": "mintlify build",
-    "sync:figma": "node scripts/pull-figma-and-update-docs.mjs",
-    "preview": "mintlify preview"
+    "sync:figma": "node scripts/pull-figma-and-update-docs.mjs"
   },
   "dependencies": {
     "dotenv": "^16.3.1",

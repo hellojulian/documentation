@@ -28,8 +28,8 @@ jobs:
           FIGMA_FILE_KEY: ${{ vars.FIGMA_FILE_KEY }}
           FIGMA_NODE_IDS: ${{ vars.FIGMA_NODE_IDS }}
           
-      - name: Build documentation
-        run: npm run build
+      - name: Test sync script
+        run: npm run sync:figma
         
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
