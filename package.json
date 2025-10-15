@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "mintlify dev",
-    "sync:figma": "node scripts/pull-figma-and-update-docs.mjs"
+    "sync:figma": "node scripts/pull-figma-and-update-docs.mjs",
+    "webhook:setup": "node scripts/setup-figma-webhook.mjs",
+    "webhook:ngrok": "ngrok http 3000"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
