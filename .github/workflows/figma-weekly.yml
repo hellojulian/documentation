@@ -1,5 +1,7 @@
 name: Figma Weekly Refresh
 on:
+  push:
+    branches: [main] # Deploy on every push to main
   schedule: 
     - cron: "0 2 * * 1" # Mondays 02:00 UTC
   workflow_dispatch: # Allow manual triggering
