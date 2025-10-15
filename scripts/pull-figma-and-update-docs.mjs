@@ -115,7 +115,7 @@ async function fetchScreenshots() {
   
   if (nodeIds.length === 0) {
     console.log("⚠️  No node IDs specified. Set FIGMA_NODE_IDS env var with comma-separated node IDs");
-    return;
+    return [];
   }
   
   try {
@@ -129,18 +129,31 @@ async function fetchScreenshots() {
     }
     
     const { images } = await response.json();
+    const downloadedImages = [];
     
     // Download each image
     for (const [nodeId, imageUrl] of Object.entries(images)) {
       if (imageUrl) {
-        await downloadImage(imageUrl, `public/images/figma-${nodeId}.png`);
-        console.log(`✅ Downloaded screenshot for node ${nodeId}`);
+        // Make filename web-safe by replacing colons with hyphens
+        const safeNodeId = nodeId.replace(/:/g, '-');
+        const filename = `figma-${safeNodeId}.png`;
+        await downloadImage(imageUrl, `public/images/${filename}`);
+        console.log(`✅ Downloaded screenshot for node ${nodeId} as ${filename}`);
+        
+        downloadedImages.push({
+          nodeId: nodeId,
+          safeNodeId: safeNodeId,
+          filename: filename,
+          path: `/images/${filename}`
+        });
       }
     }
     
     console.log("✅ Screenshots updated");
+    return downloadedImages;
   } catch (error) {
     console.error("❌ Failed to fetch screenshots:", error.message);
+    return [];
   }
 }
 
@@ -154,9 +167,103 @@ async function downloadImage(url, filepath) {
 }
 
 /**
+ * Update component pages with screenshots
+ */
+async function updateComponentPages(screenshots) {
+  console.log("📝 Updating component pages...");
+  
+  if (screenshots.length === 0) {
+    console.log("⚠️  No screenshots to update component pages with");
+    return;
+  }
+  
+  // Group screenshots by component type (you can customize this logic)
+  const componentGroups = {
+    buttons: screenshots.filter(img => 
+      img.nodeId.toLowerCase().includes('button') || 
+      img.nodeId.toLowerCase().includes('btn') ||
+      img.nodeId.includes('22123:476643') // Add your specific alert/button node
+    ),
+    forms: screenshots.filter(img => 
+      img.nodeId.toLowerCase().includes('form') || 
+      img.nodeId.toLowerCase().includes('input') ||
+      img.nodeId.toLowerCase().includes('field')
+    ),
+    cards: screenshots.filter(img => 
+      img.nodeId.toLowerCase().includes('card')
+    ),
+    other: screenshots.filter(img => 
+      !img.nodeId.toLowerCase().includes('button') &&
+      !img.nodeId.toLowerCase().includes('btn') &&
+      !img.nodeId.includes('22123:476643') &&
+      !img.nodeId.toLowerCase().includes('form') &&
+      !img.nodeId.toLowerCase().includes('input') &&
+      !img.nodeId.toLowerCase().includes('field') &&
+      !img.nodeId.toLowerCase().includes('card')
+    )
+  };
+  
+  // Update each component page
+  for (const [componentType, images] of Object.entries(componentGroups)) {
+    if (componentType === 'other' || images.length === 0) continue;
+    
+    await updateComponentPage(componentType, images);
+  }
+}
+
+/**
+ * Update a specific component page with screenshots
+ */
+async function updateComponentPage(componentType, images) {
+  const filePath = `components/${componentType}.mdx`;
+  
+  try {
+    let content = await fs.readFile(filePath, "utf-8");
+    
+    // Create screenshots section
+    const screenshotsSection = images.map(img => `
+## ${img.nodeId.replace(/:/g, '-')}
+
+<img
+  src="${img.path}"
+  alt="Component screenshot for ${img.nodeId}"
+  style="border: 1px solid #e2e8f0; border-radius: 8px; margin: 16px 0;"
+/>
+`).join('\n');
+    
+    // Replace the placeholder section
+    const timestamp = new Date().toLocaleString();
+    content = content.replace(
+      /## Component Screenshots[\s\S]*?(?=##|$)/,
+      `## Component Screenshots
+
+<Note>
+  Last updated: ${timestamp}
+</Note>
+
+${screenshotsSection}
+
+`
+    );
+    
+    // Remove the warning if screenshots are now available
+    content = content.replace(
+      /<Warning>[\s\S]*?<\/Warning>\s*/g,
+      ''
+    );
+    
+    await fs.writeFile(filePath, content);
+    console.log(`✅ Updated ${componentType} page with ${images.length} screenshots`);
+    
+  } catch (error) {
+    console.error(`❌ Failed to update ${componentType} page:`, error.message);
+  }
+}
+
+/**
  * Update MDX files with latest sync timestamp
  */
-async function updateDocumentation(tokens) {
+async function updateDocumentation(tokens, screenshots) {
   console.log("📝 Updating documentation...");
   
   try {
@@ -175,6 +282,11 @@ async function updateDocumentation(tokens) {
     // Update tokens overview page
     if (tokens) {
       await updateTokensPages(tokens);
+    }
+    
+    // Update component pages with screenshots
+    if (screenshots && screenshots.length > 0) {
+      await updateComponentPages(screenshots);
     }
     
     console.log("✅ Documentation updated");
@@ -263,13 +375,14 @@ async function main() {
     // Ensure directories exist
     await fs.mkdir("tokens/_data", { recursive: true });
     await fs.mkdir("public/images", { recursive: true });
+    await fs.mkdir("components", { recursive: true });
     
     // Fetch data from Figma
     const tokens = await fetchDesignTokens();
-    await fetchScreenshots();
+    const screenshots = await fetchScreenshots();
     
     // Update documentation
-    await updateDocumentation(tokens);
+    await updateDocumentation(tokens, screenshots);
     
     console.log("🎉 Figma sync completed successfully!");
     
