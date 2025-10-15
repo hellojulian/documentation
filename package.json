@@ -10,11 +10,12 @@
     "preview": "mintlify preview"
   },
   "dependencies": {
+    "dotenv": "^16.3.1",
     "node-fetch": "^3.3.2",
-    "dotenv": "^16.3.1"
+    "reshaped": "^3.7.4"
   },
   "devDependencies": {
-    "mintlify": "latest",
-    "@percy/cli": "^1.28.0"
+    "@percy/cli": "^1.28.0",
+    "mintlify": "latest"
   }
 }
