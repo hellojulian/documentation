@@ -19,7 +19,7 @@ dist/
 
 # Generated files
 tokens/_data/tokens.json
-public/images/figma-*.png
+# public/images/figma-*.png  # Allow Figma images to be committed for GitHub hosting
 
 # OS
 .DS_Store
