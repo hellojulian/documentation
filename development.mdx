@@ -1,0 +1,277 @@
+---
+title: 'Development'
+description: 'Development guide and troubleshooting for the Figma-Mintlify sync system'
+---
+
+## Development Setup
+
+### Local Development
+
+```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your values
+
+# Run sync script locally
+npm run sync:figma
+
+# Start Mintlify dev server
+npm run dev
+```
+
+### Project Structure
+
+```
+├── .github/workflows/
+│   ├── figma-weekly.yml      # Scheduled sync workflow
+│   └── figma-webhook.yml     # Webhook-triggered sync
+├── scripts/
+│   ├── pull-figma-and-update-docs.mjs  # Main sync script
+│   └── webhook-handler.mjs              # Webhook handler
+├── tokens/
+│   ├── _data/
+│   │   └── tokens.json      # Generated design tokens
+│   ├── colors.mdx           # Color documentation
+│   ├── typography.mdx       # Typography documentation
+│   └── spacing.mdx          # Spacing documentation
+├── public/images/           # Generated screenshots
+├── mint.json               # Mintlify configuration
+└── percy.config.js         # Percy visual testing config
+```
+
+## API Reference
+
+### Figma APIs Used
+
+- **Variables API**: `/v1/files/{file_key}/variables/local`
+- **Images API**: `/v1/images/{file_key}`
+- **Files API**: `/v1/files/{file_key}` (for node discovery)
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `FIGMA_TOKEN` | ✅ | Figma personal access token |
+| `FIGMA_FILE_KEY` | ✅ | File key from Figma URL |
+| `FIGMA_NODE_IDS` | ✅ | Comma-separated node IDs for screenshots |
+| `FIGMA_WEBHOOK_SECRET` | ⚠️ | Secret for webhook verification |
+| `PERCY_TOKEN` | ⚠️ | Percy.io token for visual testing |
+| `GITHUB_TOKEN` | ⚠️ | GitHub token for API access |
+
+## Customization
+
+### Adding New Token Types
+
+Edit `scripts/pull-figma-and-update-docs.mjs`:
+
+```javascript
+function transformVariablesToTokens(figmaData) {
+  const tokens = {
+    colors: {},
+    typography: {},
+    spacing: {},
+    shadows: {},      // Add new token type
+    borders: {},      // Add new token type
+    $lastSync: new Date().toISOString()
+  };
+
+  // Add transformation logic for new types
+  if (variable.name.toLowerCase().includes('shadow')) {
+    tokens.shadows[variable.name] = {
+      value: tokenValue,
+      type: "shadow"
+    };
+  }
+}
+```
+
+### Custom Screenshot Processing
+
+Modify the `fetchScreenshots()` function:
+
+```javascript
+async function fetchScreenshots() {
+  // Custom node selection logic
+  const nodeIds = await discoverComponentNodes();
+  
+  // Custom image processing
+  for (const [nodeId, imageUrl] of Object.entries(images)) {
+    await processAndOptimizeImage(imageUrl, nodeId);
+  }
+}
+```
+
+### Custom Documentation Templates
+
+Create new page generators:
+
+```javascript
+function generateComponentPage(componentData) {
+  return `---
+title: "${componentData.name}"
+description: "Auto-generated component documentation"
+---
+
+# ${componentData.name}
+
+![Component Screenshot](/images/figma-${componentData.nodeId}.png)
+
+## Properties
+${componentData.properties.map(prop => `- **${prop.name}**: ${prop.value}`).join('\n')}
+`;
+}
+```
+
+## Webhook Security
+
+### Verifying Figma Webhooks
+
+The webhook handler includes signature verification:
+
+```javascript
+function verifyFigmaWebhook(payload, signature, secret) {
+  const hmac = createHmac('sha256', secret);
+  hmac.update(payload);
+  const expectedSignature = hmac.digest('hex');
+  return signature === expectedSignature;
+}
+```
+
+### Webhook Event Types
+
+- `FILE_UPDATE` - File content changed
+- `LIBRARY_PUBLISH` - Design system library updated
+- `FILE_DELETE` - File deleted
+- `FILE_VERSION_UPDATE` - New version created
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Rate Limiting">
+    Figma API has rate limits:
+    - 1000 requests per minute per token
+    - Use exponential backoff for retries
+    
+    ```javascript
+    async function fetchWithRetry(url, options, retries = 3) {
+      try {
+        const response = await fetch(url, options);
+        if (response.status === 429) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, 3 - retries)));
+          return fetchWithRetry(url, options, retries - 1);
+        }
+        return response;
+      } catch (error) {
+        if (retries > 0) {
+          return fetchWithRetry(url, options, retries - 1);
+        }
+        throw error;
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Large File Handling">
+    For large Figma files:
+    - Implement pagination for node discovery
+    - Process screenshots in batches
+    - Use streaming for large downloads
+    
+    ```javascript
+    async function processInBatches(items, batchSize = 5) {
+      for (let i = 0; i < items.length; i += batchSize) {
+        const batch = items.slice(i, i + batchSize);
+        await Promise.all(batch.map(processItem));
+        await new Promise(resolve => setTimeout(resolve, 100)); // Rate limit
+      }
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Build Failures">
+    Common build issues:
+    - Missing image files
+    - Invalid MDX syntax
+    - Broken internal links
+    
+    Add validation:
+    ```javascript
+    async function validateGeneration() {
+      // Check all referenced images exist
+      // Validate MDX syntax
+      // Check internal links
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Debug Mode
+
+Enable debug logging:
+
+```bash
+DEBUG=figma-sync npm run sync:figma
+```
+
+## Performance Optimization
+
+### Caching Strategy
+
+- Cache Figma API responses locally
+- Only re-download changed images
+- Use ETags for conditional requests
+
+```javascript
+const cache = new Map();
+
+async function fetchWithCache(url, options) {
+  const cacheKey = `${url}-${JSON.stringify(options)}`;
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey);
+  }
+  
+  const response = await fetch(url, options);
+  cache.set(cacheKey, response);
+  return response;
+}
+```
+
+### Image Optimization
+
+- Use WebP format when possible
+- Implement responsive images
+- Add lazy loading
+
+## Monitoring
+
+### Health Checks
+
+Add monitoring endpoints:
+
+```javascript
+// Health check endpoint
+export async function healthCheck() {
+  return {
+    status: 'healthy',
+    lastSync: await getLastSyncTime(),
+    figmaConnectivity: await testFigmaConnection(),
+    githubConnectivity: await testGitHubConnection()
+  };
+}
+```
+
+### Metrics to Track
+
+- Sync frequency and duration
+- Error rates by API
+- Image generation success rate
+- Documentation build times
+
+<Warning>
+  Always test changes in a staging environment before deploying to production.
+</Warning>

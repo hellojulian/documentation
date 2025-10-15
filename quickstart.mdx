@@ -1,0 +1,149 @@
+---
+title: 'Quickstart'
+description: 'Set up your Figma to Mintlify automated sync in 15 minutes'
+---
+
+## Setup Overview
+
+This guide will walk you through setting up the complete Figma → Mintlify automation pipeline.
+
+<Steps>
+  <Step title="Get Figma API Token">
+    1. Go to [Figma Account Settings](https://www.figma.com/developers/api#access-tokens)
+    2. Generate a new personal access token
+    3. Copy the token (keep it secure!)
+  </Step>
+
+  <Step title="Find Your Figma File Key">
+    From your Figma file URL: `https://www.figma.com/file/ABC123/My-Design-System`
+    
+    The file key is `ABC123`
+  </Step>
+
+  <Step title="Get Node IDs for Screenshots">
+    1. Select frames/components in Figma you want to screenshot
+    2. Right-click → "Copy link"
+    3. Extract node IDs from URLs like: `node-id=123%3A456`
+    4. Decode the URL: `123:456`
+  </Step>
+
+  <Step title="Set Up GitHub Repository">
+    ```bash
+    # Clone this repository
+    git clone <your-repo-url>
+    cd your-repo
+    
+    # Install dependencies
+    npm install
+    ```
+  </Step>
+
+  <Step title="Configure Environment Variables">
+    ### GitHub Repository Secrets
+    Go to Settings → Secrets and variables → Actions:
+    
+    - `FIGMA_TOKEN` - Your Figma personal access token
+    - `PERCY_TOKEN` - Percy visual testing token (optional)
+    - `FIGMA_WEBHOOK_SECRET` - Random string for webhook security
+    
+    ### GitHub Repository Variables
+    - `FIGMA_FILE_KEY` - Your Figma file key
+    - `FIGMA_NODE_IDS` - Comma-separated node IDs for screenshots
+  </Step>
+
+  <Step title="Deploy Webhook Handler">
+    ### Option A: Vercel
+    ```bash
+    npm install -g vercel
+    vercel
+    ```
+    
+    ### Option B: Cloudflare Workers
+    Deploy `scripts/webhook-handler.mjs` to Cloudflare Workers
+    
+    ### Option C: Other platforms
+    Deploy the webhook handler to your preferred serverless platform
+  </Step>
+
+  <Step title="Set Up Figma Webhook">
+    1. Create a webhook in your Figma team settings
+    2. Webhook URL: `https://your-webhook-url.vercel.app/api/figma-webhook`
+    3. Select events: `FILE_UPDATE`
+    4. Secret: Use the same value as `FIGMA_WEBHOOK_SECRET`
+  </Step>
+
+  <Step title="Set Up Percy (Optional)">
+    1. Sign up at [Percy.io](https://percy.io)
+    2. Create a new project
+    3. Add `PERCY_TOKEN` to GitHub secrets
+  </Step>
+
+  <Step title="Test the Setup">
+    ```bash
+    # Test manual sync
+    npm run sync:figma
+    
+    # Test locally
+    npm run dev
+    ```
+  </Step>
+</Steps>
+
+## Environment Variables Reference
+
+Create a `.env` file for local development:
+
+```bash
+FIGMA_TOKEN=figd_your_token_here
+FIGMA_FILE_KEY=your_file_key
+FIGMA_NODE_IDS=123:456,789:012
+FIGMA_WEBHOOK_SECRET=your_webhook_secret
+GITHUB_TOKEN=ghp_your_github_token
+GITHUB_REPOSITORY=owner/repo-name
+PERCY_TOKEN=your_percy_token
+```
+
+## Workflows
+
+### Weekly Scheduled Sync
+- Runs every Monday at 2 AM UTC
+- Updates all design tokens and screenshots
+- Creates PR with changes
+- Includes Percy visual diffs
+
+### Real-time Webhook Sync
+- Triggered when Figma file changes
+- Near-instant documentation updates
+- Automatic PR creation
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Figma API Authentication Fails">
+    - Verify your `FIGMA_TOKEN` is correct
+    - Check token has proper permissions
+    - Ensure file is accessible to the token owner
+  </Accordion>
+
+  <Accordion title="No Screenshots Generated">
+    - Verify `FIGMA_NODE_IDS` are correct
+    - Check node IDs are properly URL-decoded
+    - Ensure nodes exist in the specified file
+  </Accordion>
+
+  <Accordion title="Webhook Not Triggering">
+    - Verify webhook URL is accessible
+    - Check `FIGMA_WEBHOOK_SECRET` matches
+    - Ensure GitHub repository dispatch permissions
+  </Accordion>
+
+  <Accordion title="Percy Snapshots Failing">
+    - Verify `PERCY_TOKEN` is set
+    - Check Percy project configuration
+    - Ensure build generates proper output
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  Need help? Check the [troubleshooting guide](/development) or create an issue in the repository.
+</Note>

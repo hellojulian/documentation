@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "scripts/webhook-handler.mjs": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/figma-webhook",
+      "destination": "/scripts/webhook-handler.mjs"
+    }
+  ]
+}

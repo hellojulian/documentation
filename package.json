@@ -1,0 +1,20 @@
+{
+  "name": "figma-mintlify-sync",
+  "version": "1.0.0",
+  "description": "Automated Figma to Mintlify documentation sync",
+  "type": "module",
+  "scripts": {
+    "dev": "mintlify dev",
+    "build": "mintlify build",
+    "sync:figma": "node scripts/pull-figma-and-update-docs.mjs",
+    "preview": "mintlify preview"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "mintlify": "latest",
+    "@percy/cli": "^1.28.0"
+  }
+}

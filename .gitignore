@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Build output
+build/
+dist/
+.next/
+
+# Cache
+.cache/
+.percy/
+
+# Generated files
+tokens/_data/tokens.json
+public/images/figma-*.png
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
