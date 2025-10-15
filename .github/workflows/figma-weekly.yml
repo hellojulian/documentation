@@ -28,9 +28,6 @@ jobs:
           FIGMA_TOKEN: ${{ secrets.FIGMA_TOKEN }}
           FIGMA_FILE_KEY: ${{ vars.FIGMA_FILE_KEY }}
           FIGMA_NODE_IDS: ${{ vars.FIGMA_NODE_IDS }}
-          
-      - name: Test sync script
-        run: npm run sync:figma
         
       - name: Percy visual snapshots
         if: always()
