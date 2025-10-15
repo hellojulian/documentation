@@ -11,7 +11,7 @@ config();
 const FIGMA_API = "https://api.figma.com/v1";
 const FIGMA_TOKEN = process.env.FIGMA_TOKEN;
 const FIGMA_FILE_KEY = process.env.FIGMA_FILE_KEY;
-const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || "hellojulian/mintlify";
+const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || "hellojulian/documentation";
 
 if (!FIGMA_TOKEN || !FIGMA_FILE_KEY) {
   console.error("❌ Missing required environment variables:");
